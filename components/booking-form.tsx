@@ -28,12 +28,14 @@ export function BookingForm({ selectedFrom, selectedTo }: BookingFormProps) {
     email: '',
     phone: '',
   })
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     
     try {
-      const { error } = await supabase
+      const { data, error: supabaseError } = await supabase
         .from('bookings')
         .insert([
           {
@@ -45,13 +47,18 @@ export function BookingForm({ selectedFrom, selectedTo }: BookingFormProps) {
             status: 'pending'
           }
         ])
+        .select()
 
-      if (error) throw error
+      if (supabaseError) {
+        console.error('Supabase error:', supabaseError)
+        setError(`Chyba při vytváření rezervace: ${supabaseError.message}`)
+        return
+      }
       
-      setStep('confirmation')
+      setStep('payment')
     } catch (error) {
       console.error('Error creating booking:', error)
-      alert('Došlo k chybě při vytváření rezervace.')
+      setError(`Došlo k chybě při vytváření rezervace: ${error}`)
     }
   }
 
@@ -61,6 +68,12 @@ export function BookingForm({ selectedFrom, selectedTo }: BookingFormProps) {
 
   return (
     <div className="bg-white rounded-3xl shadow-lg p-8">
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
+      
       <div className="flex items-center justify-center mb-8">
         {['details', 'payment', 'confirmation'].map((s, index) => (
           <>

@@ -18,8 +18,11 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess }: PaymentForm
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
+  const [clientSecret, setClientSecret] = useState('')
 
   useEffect(() => {
+    if (!stripe || !elements) return
+
     fetch('/api/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -27,11 +30,13 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess }: PaymentForm
     })
       .then((res) => res.json())
       .then((data) => {
-        if (elements) {
-          elements.update({ clientSecret: data.clientSecret })
-        }
+        setClientSecret(data.clientSecret)
       })
-  }, [selectedFrom, selectedTo, elements])
+      .catch((error) => {
+        console.error('Error:', error)
+        alert('Došlo k chybě při inicializaci platby')
+      })
+  }, [stripe, elements, selectedFrom, selectedTo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,9 +61,23 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess }: PaymentForm
     setIsLoading(false)
   }
 
+  if (!clientSecret) {
+    return <div>Načítání platební brány...</div>
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
+      <PaymentElement 
+        options={{
+          layout: 'tabs',
+          paymentMethodOrder: ['card'],
+          defaultValues: {
+            billingDetails: {
+              name: 'Jan Novák',
+            }
+          }
+        }}
+      />
       <Button
         type="submit"
         disabled={isLoading || !stripe || !elements}
