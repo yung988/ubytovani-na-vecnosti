@@ -21,19 +21,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Webhook Error: ${err}` }, { status: 400 })
   }
 
-  // Handle the event
-  switch (event.type) {
-    case 'payment_intent.succeeded':
-      const { id } = event.data.object as Stripe.PaymentIntent
-      // Aktualizovat status rezervace v databázi
-      await supabase
-        .from('bookings')
-        .update({ status: 'confirmed' })
-        .eq('payment_intent_id', id)
-      break
-    default:
-      console.log(`Unhandled event type ${event.type}`)
-  }
+  try {
+    switch (event.type) {
+      case 'payment_intent.succeeded':
+        const { id } = event.data.object as Stripe.PaymentIntent
+        await supabase
+          .from('bookings')
+          .update({ status: 'confirmed' })
+          .eq('payment_intent_id', id)
+        break
+      default:
+        console.log(`Unhandled event type ${event.type}`)
+    }
 
-  return NextResponse.json({ received: true })
+    return NextResponse.json({ received: true })
+  } catch (error) {
+    console.error('Error processing webhook:', error)
+    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })
+  }
 } 
