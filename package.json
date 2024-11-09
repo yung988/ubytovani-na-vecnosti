@@ -2,6 +2,7 @@
   "name": "na-vecnosti",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -25,6 +26,7 @@
     "react-dom": "^18",
     "shadcn": "^2.1.6",
     "shadcn-ui": "^0.9.3",
+    "sharp": "^0.33.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "tooltip": "^1.6.1"
