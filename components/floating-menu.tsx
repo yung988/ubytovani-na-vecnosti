@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 interface FloatingMenuProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
+  showContactInfo: boolean
   setShowContactInfo: (show: boolean) => void
 }
 
@@ -28,14 +29,14 @@ const menuItems = [
   { 
     icon: Mail, 
     label: 'Kontakt',
-    onClick: (setOpen: (open: boolean) => void, setShowContact: (show: boolean) => void) => {
-      setShowContact(true)
+    onClick: (setOpen: (open: boolean) => void, setShowContact: (show: boolean) => void, currentShowContact: boolean) => {
+      setShowContact(!currentShowContact)
       setOpen(false)
     }
   }
 ]
 
-export function FloatingMenu({ isOpen, setIsOpen, setShowContactInfo }: FloatingMenuProps) {
+export function FloatingMenu({ isOpen, setIsOpen, showContactInfo, setShowContactInfo }: FloatingMenuProps) {
   return (
     <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4">
       {/* Menu tlačítka */}
@@ -58,7 +59,7 @@ export function FloatingMenu({ isOpen, setIsOpen, setShowContactInfo }: Floating
                 <Button
                   variant="outline"
                   className="bg-white shadow-md hover:shadow-lg transition-all rounded-full px-6 py-3 flex items-center gap-2"
-                  onClick={() => item.onClick(setIsOpen, setShowContactInfo)}
+                  onClick={() => item.onClick(setIsOpen, setShowContactInfo, showContactInfo)}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
