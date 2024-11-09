@@ -35,7 +35,7 @@ export function BookingForm({ selectedFrom, selectedTo }: BookingFormProps) {
     setError(null)
     
     try {
-      const { data, error: supabaseError } = await supabase
+      const { error: supabaseError } = await supabase
         .from('bookings')
         .insert([
           {
@@ -47,7 +47,6 @@ export function BookingForm({ selectedFrom, selectedTo }: BookingFormProps) {
             status: 'pending'
           }
         ])
-        .select()
 
       if (supabaseError) {
         console.error('Supabase error:', supabaseError)
@@ -144,6 +143,7 @@ export function BookingForm({ selectedFrom, selectedTo }: BookingFormProps) {
               selectedFrom={selectedFrom!} 
               selectedTo={selectedTo!} 
               onSuccess={() => setStep('confirmation')}
+              formData={formData}
             />
           </Elements>
         </div>

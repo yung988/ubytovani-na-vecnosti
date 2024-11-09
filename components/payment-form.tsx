@@ -12,9 +12,14 @@ interface PaymentFormProps {
   selectedFrom: string
   selectedTo: string
   onSuccess: () => void
+  formData: {
+    name: string
+    email: string
+    phone: string
+  }
 }
 
-export function PaymentForm({ selectedFrom, selectedTo, onSuccess }: PaymentFormProps) {
+export function PaymentForm({ selectedFrom, selectedTo, onSuccess, formData }: PaymentFormProps) {
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
@@ -73,7 +78,24 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess }: PaymentForm
           paymentMethodOrder: ['card'],
           defaultValues: {
             billingDetails: {
-              name: 'Jan Novák',
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+            }
+          },
+          fields: {
+            billingDetails: {
+              name: 'auto',
+              email: 'auto',
+              phone: 'auto',
+              address: {
+                country: 'auto',
+                postalCode: 'auto',
+                line1: 'auto',
+                line2: 'auto',
+                city: 'auto',
+                state: 'auto',
+              }
             }
           }
         }}
