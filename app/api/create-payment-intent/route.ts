@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
-
-// Debug log pro kontrolu, že klíč je načten
-console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY)
+import { supabase } from '@/lib/supabase'
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing STRIPE_SECRET_KEY')
@@ -16,23 +14,21 @@ const PRICE_PER_NIGHT = 2000 // 2000 Kč za noc
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    console.log('Received request:', body)
+    const { from, to, formData } = await request.json()
     
-    if (!body.from || !body.to) {
+    if (!from || !to || !formData) {
       return NextResponse.json(
-        { error: 'Missing required fields: from and to dates' },
+        { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    const fromDate = new Date(body.from)
-    const toDate = new Date(body.to)
+    const fromDate = new Date(from)
+    const toDate = new Date(to)
     const nights = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24))
     const amount = nights * PRICE_PER_NIGHT
 
-    console.log('Creating payment intent:', { nights, amount })
-
+    // Vytvořit payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
       currency: 'czk',
@@ -41,9 +37,28 @@ export async function POST(request: Request) {
       },
     })
 
+    // Uložit rezervaci do databáze
+    const { error: bookingError } = await supabase
+      .from('bookings')
+      .insert([
+        {
+          check_in: from,
+          check_out: to,
+          guest_name: formData.name,
+          guest_email: formData.email,
+          guest_phone: formData.phone,
+          status: 'pending',
+          payment_intent_id: paymentIntent.id
+        }
+      ])
+
+    if (bookingError) {
+      throw bookingError
+    }
+
     return NextResponse.json({ clientSecret: paymentIntent.client_secret })
   } catch (error) {
-    console.error('Error in create-payment-intent:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error occurred' },
       { status: 500 }

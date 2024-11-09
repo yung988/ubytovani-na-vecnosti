@@ -31,17 +31,24 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess, formData }: P
     fetch('/api/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: selectedFrom, to: selectedTo }),
+      body: JSON.stringify({ 
+        from: selectedFrom, 
+        to: selectedTo,
+        formData 
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
+        if (data.error) {
+          throw new Error(data.error)
+        }
         setClientSecret(data.clientSecret)
       })
       .catch((error) => {
         console.error('Error:', error)
         alert('Došlo k chybě při inicializaci platby')
       })
-  }, [stripe, elements, selectedFrom, selectedTo])
+  }, [stripe, elements, selectedFrom, selectedTo, formData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

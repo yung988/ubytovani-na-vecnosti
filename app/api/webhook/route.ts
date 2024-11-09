@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { headers } from 'next/headers'
+import { supabase } from '@/lib/supabase'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-10-28.acacia'
@@ -23,8 +24,12 @@ export async function POST(req: Request) {
   // Handle the event
   switch (event.type) {
     case 'payment_intent.succeeded':
-      const paymentIntent = event.data.object as Stripe.PaymentIntent
+      const { id } = event.data.object as Stripe.PaymentIntent
       // Aktualizovat status rezervace v databázi
+      await supabase
+        .from('bookings')
+        .update({ status: 'confirmed' })
+        .eq('payment_intent_id', id)
       break
     default:
       console.log(`Unhandled event type ${event.type}`)
