@@ -3,6 +3,16 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
+import { PaymentForm } from './payment-form'
+
+// Ujistíme se, že máme správně nastavený environment variable
+if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+  throw new Error('Missing Stripe publishable key')
+}
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 interface BookingFormProps {
   selectedFrom: string | null
@@ -116,14 +126,13 @@ export function BookingForm({ selectedFrom, selectedTo }: BookingFormProps) {
       {step === 'payment' && (
         <div className="space-y-6">
           <h2 className="text-2xl font-light mb-6">Platba</h2>
-          {/* Zde bude implementace platební brány */}
-          <p className="text-gray-500">Platební brána bude implementována později</p>
-          <Button
-            onClick={() => setStep('confirmation')}
-            className="w-full bg-stone-900 hover:bg-stone-800"
-          >
-            Dokončit rezervaci
-          </Button>
+          <Elements stripe={stripePromise}>
+            <PaymentForm 
+              selectedFrom={selectedFrom!} 
+              selectedTo={selectedTo!} 
+              onSuccess={() => setStep('confirmation')}
+            />
+          </Elements>
         </div>
       )}
 
