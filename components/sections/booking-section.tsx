@@ -26,14 +26,14 @@ export function BookingSection({
     name: '',
     email: '',
     phone: '',
-    date: new Date()
+    date: selectedDate || new Date()
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('bookings')
         .insert([
           {
@@ -46,6 +46,14 @@ export function BookingSection({
         ])
 
       if (error) throw error
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        date: new Date()
+      })
       
       onBookingRequest()
     } catch (error) {
@@ -62,18 +70,59 @@ export function BookingSection({
         className="bg-white rounded-3xl shadow-lg p-8"
       >
         <h2 className="text-2xl font-light mb-6 text-center">Rezervace</h2>
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={onDateSelect}
-          className="rounded-lg mx-auto"
-        />
-        <Button
-          className="w-full mt-6 bg-stone-900 hover:bg-stone-800"
-          onClick={handleSubmit}
-        >
-          Kontaktovat pro rezervaci
-        </Button>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Jméno</label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-stone-500 focus:ring-stone-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-stone-500 focus:ring-stone-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Telefon</label>
+            <input
+              type="tel"
+              required
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-stone-500 focus:ring-stone-500"
+            />
+          </div>
+
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => {
+              onDateSelect(date)
+              if (date) {
+                setFormData({...formData, date})
+              }
+            }}
+            className="rounded-lg mx-auto"
+          />
+          
+          <Button
+            type="submit"
+            className="w-full bg-stone-900 hover:bg-stone-800"
+          >
+            Odeslat rezervaci
+          </Button>
+        </form>
       </motion.div>
     </div>
   )
