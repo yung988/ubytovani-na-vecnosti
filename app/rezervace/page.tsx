@@ -1,9 +1,18 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { BookingForm } from '@/components/booking-form'
+import { BookingForm } from '../../components/booking-form'
+import { Suspense } from 'react'
 
 export default function ReservationPage() {
+  return (
+    <Suspense fallback={<div>Načítání...</div>}>
+      <ReservationContent />
+    </Suspense>
+  )
+}
+
+function ReservationContent() {
   const searchParams = useSearchParams()
   const from = searchParams.get('from')
   const to = searchParams.get('to')
