@@ -21,13 +21,11 @@ export async function POST(req: Request) {
 
     switch (event.type) {
       case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object as Stripe.PaymentIntent
-        // Zde zpracujte úspěšnou platbu
-        // Například aktualizace databáze, odeslání potvrzovacího emailu atd.
+        console.log('Payment succeeded:', event.data.object)
         break
         
       case 'payment_intent.payment_failed':
-        // Zde zpracujte neúspěšnou platbu
+        console.log('Payment failed:', event.data.object)
         break
     }
 
