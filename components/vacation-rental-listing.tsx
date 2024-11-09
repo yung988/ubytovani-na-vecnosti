@@ -12,7 +12,6 @@ import { ImageDialog } from "./dialogs/image-dialog"
 import { motion } from "framer-motion"
 
 export default function VacationRentalListing() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [showContactInfo, setShowContactInfo] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -51,11 +50,7 @@ export default function VacationRentalListing() {
 
           <ReviewsSection />
 
-          <BookingSection 
-            selectedDate={selectedDate}
-            onDateSelect={setSelectedDate}
-            onBookingRequest={() => setShowContactInfo(true)}
-          />
+          <BookingSection />
         </div>
       </div>
 

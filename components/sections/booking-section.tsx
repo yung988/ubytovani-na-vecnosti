@@ -29,7 +29,7 @@ export function BookingSection() {
   const [isLoading, setIsLoading] = useState(true)
   const [step, setStep] = useState<'calendar' | 'details'>('calendar')
 
-  // Načtení existujících rezervací
+  // Načtení existujících rezervací při načtení komponenty
   useEffect(() => {
     async function fetchBookings() {
       try {
