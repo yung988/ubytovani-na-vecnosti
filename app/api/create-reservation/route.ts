@@ -39,7 +39,8 @@ export async function POST(request: Request) {
           guest_name: guestName,
           guest_email: guestEmail,
           payment_method: paymentMethod,
-          payment_status: paymentMethod === 'card' ? 'pending' : 'confirmed'
+          payment_status: paymentMethod === 'card' ? 'pending' : 'confirmed',
+          total_price: totalPrice
         }
       ])
       .select()
