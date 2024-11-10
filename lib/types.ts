@@ -1,7 +1,10 @@
 export interface BookingFormData {
   name: string
   email: string
-  phone: string
+  dateFrom: string
+  dateTo: string
+  selectedFrom?: string | null // přidáno
+  selectedTo?: string | null // přidáno
 }
 
 export interface Booking {

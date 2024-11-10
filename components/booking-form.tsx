@@ -9,9 +9,14 @@ import { BookingInitialForm } from './booking-initial-form'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
-export function BookingForm() {
-  const [selectedFrom, setSelectedFrom] = useState('')
-  const [selectedTo, setSelectedTo] = useState('')
+interface BookingFormProps {
+  selectedFrom?: string | null
+  selectedTo?: string | null
+}
+
+export function BookingForm({ selectedFrom: initialFrom, selectedTo: initialTo }: BookingFormProps = {}) {
+  const [selectedFrom, setSelectedFrom] = useState(initialFrom || '')
+  const [selectedTo, setSelectedTo] = useState(initialTo || '')
   const [formData, setFormData] = useState<BookingFormData | null>(null)
   const [showPayment, setShowPayment] = useState(false)
 
@@ -40,11 +45,14 @@ export function BookingForm() {
           <PaymentForm
             selectedFrom={selectedFrom}
             selectedTo={selectedTo}
-            formData={formData}
+            formData={{
+              ...formData,
+              phone: '' // přidáme výchozí prázdný telefon
+            }}
             onSuccess={handlePaymentSuccess}
           />
         </Elements>
       )}
     </div>
   )
-} 
+}
