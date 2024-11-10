@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const PRICE_PER_NIGHT = 2000; // 2000 Kč za noc
 
 export async function POST(request: Request) {
   try {

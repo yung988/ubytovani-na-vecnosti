@@ -88,18 +88,6 @@ export function BookingSection() {
     return data.available;
   };
 
-  const createReservation = async (reservationData: ReservationData) => {
-    const response = await fetch('/api/create-reservation', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(reservationData),
-    });
-    
-    return response.json();
-  };
-
   return (
     <div id="booking" className="max-w-xl mx-auto">
       <motion.div
