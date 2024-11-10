@@ -7,7 +7,8 @@ import { PaymentForm } from './payment/payment-form'
 import { BookingFormData } from '@/lib/types'
 import { BookingInitialForm } from './booking-initial-form'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+// Použijeme přímo klíč místo process.env
+const stripePromise = loadStripe('pk_live_51Q3rVNECICPYvq5cBWx6jH8FXyz1cA1AdJirqzGlQAchTQyXf8kfas1mOR6foCjetjFx9nSdhE5momeEE9UEFDJE001M7y8pkg')
 
 interface BookingFormProps {
   selectedFrom?: string | null

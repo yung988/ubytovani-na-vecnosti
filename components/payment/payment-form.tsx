@@ -7,6 +7,8 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js'
+import { DialogTitle } from '@radix-ui/react-dialog'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 
 interface PaymentFormProps {
   selectedFrom: string
@@ -88,6 +90,15 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess, formData }: P
     }
   }
 
+  if (!stripe || !elements) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-900"></div>
+        <span className="ml-2">Inicializace platební brány...</span>
+      </div>
+    )
+  }
+
   if (error) {
     return (
       <div className="p-4 bg-red-50 text-red-600 rounded-md">
@@ -113,6 +124,9 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess, formData }: P
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <DialogTitle>
+        <VisuallyHidden>Platební formulář</VisuallyHidden>
+      </DialogTitle>
       <PaymentElement 
         options={{
           layout: 'tabs',
