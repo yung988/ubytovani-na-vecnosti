@@ -19,6 +19,10 @@ interface ResendWebhookPayload {
   data: ResendWebhookData;
 }
 
+// Nová konfigurace pro Next.js 14+
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   const payload = await request.json() as ResendWebhookPayload;
   const signature = request.headers.get('resend-signature');
@@ -83,10 +87,4 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-}
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}; 
+} 

@@ -13,8 +13,10 @@ export async function POST(request: Request) {
       throw new Error('Chybí RESEND_API_KEY v prostředí');
     }
 
+    console.log('Odesílám email na:', reservation.guest_email);
+
     const data = await resend.emails.send({
-      from: 'Na Věčnosti <rezervace@navecnosti.cz>',
+      from: 'onboarding@resend.dev',
       to: [reservation.guest_email],
       subject: 'Potvrzení rezervace - Na Věčnosti',
       react: ReservationConfirmationEmail({
@@ -32,6 +34,8 @@ export async function POST(request: Request) {
         }
       ]
     });
+
+    console.log('Email odeslán:', data);
 
     return NextResponse.json({ success: true, data });
   } catch (error) {

@@ -6,6 +6,10 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
+// Nová konfigurace pro Next.js 14+
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature')!;
@@ -52,10 +56,4 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-}
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}; 
+} 

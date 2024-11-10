@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     // Výpočet ceny
     const nights = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
-    const totalPrice = nights * PRICE_PER_NIGHT;
+    const totalPrice = nights * 2000; // 2000 Kč za noc
 
     // Vytvoříme rezervaci
     const { data: reservation, error } = await supabase
@@ -40,8 +40,7 @@ export async function POST(request: Request) {
           guest_name: guestName,
           guest_email: guestEmail,
           payment_method: paymentMethod,
-          payment_status: paymentMethod === 'card' ? 'pending' : 'confirmed',
-          total_price: totalPrice
+          payment_status: paymentMethod === 'card' ? 'pending' : 'confirmed'
         }
       ])
       .select()
