@@ -23,10 +23,14 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess, formData }: P
   const stripe = useStripe()
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState('')
 
   useEffect(() => {
     if (!stripe || !elements) return
+
+    setIsLoading(true)
+    setError(null)
 
     fetch('/api/create-payment-intent', {
       method: 'POST',
@@ -37,16 +41,22 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess, formData }: P
         formData 
       }),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          throw new Error(data.error)
+      .then(async (res) => {
+        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data.error || 'Něco se pokazilo')
         }
+        return data
+      })
+      .then((data) => {
         setClientSecret(data.clientSecret)
       })
       .catch((error) => {
+        setError(error.message)
         console.error('Error:', error)
-        alert('Došlo k chybě při inicializaci platby')
+      })
+      .finally(() => {
+        setIsLoading(false)
       })
   }, [stripe, elements, selectedFrom, selectedTo, formData])
 
@@ -55,26 +65,50 @@ export function PaymentForm({ selectedFrom, selectedTo, onSuccess, formData }: P
     if (!stripe || !elements) return
 
     setIsLoading(true)
+    setError(null)
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/rezervace/potvrzeni`,
-      },
-    })
+    try {
+      const { error: paymentError } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/rezervace/potvrzeni`,
+        },
+      })
 
-    if (error) {
-      console.error('Payment error:', error)
-      alert('Došlo k chybě při platbě')
-    } else {
+      if (paymentError) {
+        throw new Error(paymentError.message || 'Platba se nezdařila')
+      }
+
       onSuccess()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Došlo k chybě při platbě')
+      console.error('Payment error:', err)
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
-  if (!clientSecret) {
-    return <div>Načítání platební brány...</div>
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 text-red-600 rounded-md">
+        <p>Chyba: {error}</p>
+        <Button 
+          onClick={() => setError(null)}
+          className="mt-2"
+        >
+          Zkusit znovu
+        </Button>
+      </div>
+    )
+  }
+
+  if (isLoading && !clientSecret) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-stone-900"></div>
+        <span className="ml-2">Načítání platební brány...</span>
+      </div>
+    )
   }
 
   return (
